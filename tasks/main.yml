@@ -1,0 +1,57 @@
+- name: install curl
+  chocolatey.chocolatey.win_chocolatey:
+    name: curl
+
+- name: download artifact
+  ansible.windows.win_get_url:
+    url: "https://github.com/{{ app_repo }}/releases/download/{{ app_version }}/{{ artifact_name }}.zip"
+    dest: "{{ download_directory }}\\{{ artifact_name }}.zip"
+    force: false
+
+- name: create extract directory
+  ansible.windows.win_file:
+    path: "{{ extract_directory }}"
+    state: directory
+
+- name: extract download
+  community.windows.win_unzip:
+    src: "{{ download_directory }}\\{{ artifact_name }}.zip"
+    dest: "{{ extract_directory }}"
+    creates: "{{ extract_directory }}"
+
+- name: get installed build.json stat
+  ansible.windows.win_stat:
+    path: "{{ install_directory }}\\build.json"
+  register: installed_build_json
+
+- name: get extracted build.json stat
+  ansible.windows.win_stat:
+    path: "{{ extract_directory }}\\build.json"
+  register: extracted_build_json
+
+- name: stop running process
+  ansible.windows.win_shell: Stop-Process -Force -Name "{{ app_name }}"; [void]
+  when: not installed_build_json.stat.exists or not extracted_build_json.stat.exists or installed_build_json.stat.checksum != extracted_build_json.stat.checksum
+
+- name: Sync extract and install directory
+  community.windows.win_robocopy:
+    src: "{{ extract_directory }}"
+    dest: "{{ install_directory }}"
+    recurse: true
+    purge: true
+  notify:
+    - reboot
+
+- name: create {{ app_name }} config directory
+  ansible.windows.win_file:
+    path: "{{ config_directory }}"
+    state: directory
+  when: config_file is not none
+
+- name: create config file for {{ app_name }}
+  ansible.windows.win_template:
+    src: "{{ config_file }}"
+    dest: "{{ config_file_path }}"
+  notify:
+    - reboot
+  when: config_file is not none

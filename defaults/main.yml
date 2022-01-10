@@ -1,0 +1,10 @@
+app_repo: null
+app_name: null
+app_version: null
+artifact_name: "{{ app_name }}-{{ app_version }}"
+download_directory: "{{ ansible_user_dir }}\\Downloads"
+extract_directory: "{{ download_directory }}\\{{ app_name }}-{{ app_version }}"
+install_directory: "C:\\Program Files\\{{ app_name }}"
+config_file: null
+config_directory: null
+config_file_path: null

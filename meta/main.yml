@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  author: ART+COM AG
+  description: install and configure a Windows exe from a repo artifact
+  license: license (MIT)
+
+  min_ansible_version: 5.0
+  platforms:
+    - name: Windows
+      versions:
+        - 10
+
+  galaxy_tags: []
+
+dependencies:
+  - src: git+https://github.com/artcom/ansible-role-check-required-variables.git
+    scm: git
+    version: "v1.0.0"
+    name: check-required-variables
