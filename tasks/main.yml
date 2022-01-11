@@ -8,16 +8,11 @@
     dest: "{{ download_directory }}\\{{ artifact_name }}.zip"
     force: false
 
-- name: create extract directory
-  ansible.windows.win_file:
-    path: "{{ extract_directory }}"
-    state: directory
-
 - name: extract download
   community.windows.win_unzip:
     src: "{{ download_directory }}\\{{ artifact_name }}.zip"
     dest: "{{ extract_directory }}"
-    creates: "{{ extract_directory }}"
+    creates: "{{ extract_directory }}\\build.json"
 
 - name: get installed build.json stat
   ansible.windows.win_stat:
